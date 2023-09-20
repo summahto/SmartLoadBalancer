@@ -3,10 +3,10 @@ package com.swen.loadbalancer;
 public class StartLoadBalancer {
     public static void main(String[] args) {
 
-        LoadbalancerRunnable loadbalancerRunnable1 = new LoadbalancerRunnable(6000);
+        Loadbalancer loadbalancerRunnable1 = new Loadbalancer(6000);
         Thread loadbalancerThread1 = new Thread(loadbalancerRunnable1);
 
-        LoadbalancerRunnable loadbalancerRunnable2 = new LoadbalancerRunnable(6001);
+        Loadbalancer loadbalancerRunnable2 = new Loadbalancer(6001);
         Thread loadbalancerThread2 = new Thread(loadbalancerRunnable2);
 
         loadbalancerThread1.start();

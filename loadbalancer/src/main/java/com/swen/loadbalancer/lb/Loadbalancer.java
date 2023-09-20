@@ -11,11 +11,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 
-public class LoadbalancerRunnable implements Runnable {
+public class Loadbalancer implements Runnable {
 
     private int port;
 
-    public LoadbalancerRunnable(int port) {
+    public Loadbalancer(int port) {
         this.port = port;
     }
 
