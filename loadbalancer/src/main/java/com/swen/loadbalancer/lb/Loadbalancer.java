@@ -1,4 +1,4 @@
-package com.swen.loadbalancer;
+package com.swen.loadbalancer.lb;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class Loadbalancer implements Runnable {
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toClient);
                 PrintWriter writeToClient = new PrintWriter(outputStreamWriter)) {
 
-            System.out.println("Connection established...");
+            System.out.println("Connection established...:" + this.port);
             String line = null;
             String responseToClient = null;
 
