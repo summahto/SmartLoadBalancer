@@ -1,4 +1,4 @@
-package com.swen.loadbalancer;
+package com.swen.loadbalancer.lb;
 
 public class StartLoadBalancer {
     public static void main(String[] args) {

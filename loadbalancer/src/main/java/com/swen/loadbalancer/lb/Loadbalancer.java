@@ -1,4 +1,4 @@
-package com.swen.loadbalancer;
+package com.swen.loadbalancer.lb;
 
 import java.io.BufferedReader;
 import java.io.IOException;

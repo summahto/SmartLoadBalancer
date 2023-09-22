@@ -1,4 +1,4 @@
-package com.swen.loadbalancer;
+package com.swen.loadbalancer.lb;
 
 import java.net.URL;
 import java.util.concurrent.locks.ReadWriteLock;

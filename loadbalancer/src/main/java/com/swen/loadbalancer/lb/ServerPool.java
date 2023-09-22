@@ -1,4 +1,4 @@
-package com.swen.loadbalancer;
+package com.swen.loadbalancer.lb;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -54,5 +54,13 @@ public class ServerPool {
         // Return true if it's alive, false otherwise
         System.out.println("Checking whether the backend is alive or not : " + url.toString());
         return true;
+    }
+
+    public AtomicInteger getCurrent() {
+        return current;
+    }
+
+    public List<Backend> getBackends() {
+        return backends;
     }
 }

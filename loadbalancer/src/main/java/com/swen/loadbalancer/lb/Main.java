@@ -1,4 +1,4 @@
-package com.swen.loadbalancer;
+package com.swen.loadbalancer.lb;
 
 import java.net.URL;
 import java.util.Scanner;
@@ -27,6 +27,12 @@ public class Main {
         }
 
         // Implement the HTTP server and load balancing logic here
+
+        for (Backend backends : serverPool.getBackends()) {
+            Backend server = serverPool.getNextPeer();
+            System.out.println("Request sent to " + server.getUrl().toString());
+        }
+
         // Use Apache HttpClient for the HTTP server
 
         // Start the health check routine in a separate thread
