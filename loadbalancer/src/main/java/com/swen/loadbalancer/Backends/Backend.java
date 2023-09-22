@@ -31,7 +31,7 @@ public class Backend {
         this.heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
-    public void start(){
+    public void start(Socket server){
         heartbeatScheduler.scheduleAtFixedRate(this::sendHeartbeat, 0, SENDING_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
@@ -50,6 +50,8 @@ public class Backend {
 
             // Accept a client connection (the Load Balancer)
             clientSocket = serverSocket.accept();
+
+            // send dummy message to load balancer
             System.out.println("Received heartbeat request from " + port);
 
             // Assuming the heartbeat is successful
@@ -83,7 +85,15 @@ public class Backend {
         BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String request = reader.readLine();
         System.out.println("Received request from LoadBalancer: " + request);
+    }
 
-        // Process the request as needed
+    public static void main(String[] args){
+        // // Start the heartbeat
+        // Backend backend1 = new Backend(6000);  
+        // Backend backend2 = new Backend(6001);  
+                
+        // backend1.start();
+        // backend2.start();
+        
     }
 }

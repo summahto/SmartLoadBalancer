@@ -8,13 +8,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class Backend2 {
+public class Backend1 {
     public int SENDING_INTERVAL_SECONDS = 5;
     private ScheduledExecutorService heartbeatScheduler;
     private int listeningPort;
     private AtomicBoolean isAlive;
 
-    public Backend2(int listeningPort) {
+    public Backend1(int listeningPort) {
         this.listeningPort = listeningPort;
         this.isAlive = new AtomicBoolean(false);
         this.heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
@@ -83,10 +83,10 @@ public class Backend2 {
     }
 
     public static void main(String[] args) {
-        int listeningPort = 6001;
+        int listeningPort = 6000;
 
-        Backend2 backend2 = new Backend2(listeningPort);
-        backend2.start();
+        Backend1 backend1 = new Backend1(listeningPort);
+        backend1.start();
 
         String hostname;
         if (args.length == 1)
@@ -94,7 +94,7 @@ public class Backend2 {
         else
             hostname = "localhost";
 
-        try (Socket server = new Socket(hostname, 6001);
+        try (Socket server = new Socket(hostname, 6000);
                 InputStream fromServer = server.getInputStream();
                 InputStreamReader reader = new InputStreamReader(fromServer);
                 BufferedReader brFromServer = new BufferedReader(reader);
