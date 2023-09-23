@@ -35,7 +35,7 @@ public class Loadbalancer extends HeartBeatReceiver implements Runnable {
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toClient);
                 PrintWriter writeToClient = new PrintWriter(outputStreamWriter)) {
 
-            System.out.println("Connection established...");
+            System.out.println("Connection established...:" + this.port);
             String line = null;
             String responseToClient = null;
 
