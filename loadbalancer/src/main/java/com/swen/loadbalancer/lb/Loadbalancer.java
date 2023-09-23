@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 
 public class Loadbalancer extends HeartBeatReceiver implements Runnable {
 
@@ -18,8 +19,11 @@ public class Loadbalancer extends HeartBeatReceiver implements Runnable {
     // private int host;
     private int port;
 
-    public Loadbalancer(int port) {
+    private BlockingQueue<String> blockingQueue;
+
+    public Loadbalancer(int port, BlockingQueue<String> blockingQueue) {
         this.port = port;
+        this.blockingQueue = blockingQueue;
     }
 
     @Override
