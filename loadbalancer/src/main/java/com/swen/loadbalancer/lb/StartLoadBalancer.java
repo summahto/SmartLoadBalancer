@@ -1,7 +1,5 @@
 package com.swen.loadbalancer.lb;
 
-import com.swen.loadbalancer.Backends.Backend;
-
 public class StartLoadBalancer {
     public static void main(String[] args) {
 

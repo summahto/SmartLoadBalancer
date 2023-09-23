@@ -1,0 +1,84 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Backend1",
+            "request": "launch",
+            "mainClass": "loadbalancer.src.main.java.com.swen.loadbalancer.Backends.Backend1",
+            "projectName": "SmartLoadBalancer_686ca8d5"
+        },
+        {
+            "type": "java",
+            "name": "Backend2",
+            "request": "launch",
+            "mainClass": "loadbalancer.src.main.java.com.swen.loadbalancer.Backends.Backend2",
+            "projectName": "SmartLoadBalancer_686ca8d5"
+        },
+        {
+            "type": "java",
+            "name": "LoadbalancerApplication",
+            "request": "launch",
+            "mainClass": "loadbalancer.src.main.java.com.swen.loadbalancer.lb.LoadbalancerApplication",
+            "projectName": "SmartLoadBalancer_686ca8d5"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "loadbalancer.src.main.java.com.swen.loadbalancer.lb.Main",
+            "projectName": "SmartLoadBalancer_686ca8d5"
+        },
+        {
+            "type": "java",
+            "name": "StartLoadBalancer",
+            "request": "launch",
+            "mainClass": "loadbalancer.src.main.java.com.swen.loadbalancer.lb.StartLoadBalancer",
+            "projectName": "SmartLoadBalancer_686ca8d5"
+        },
+        {
+            "type": "java",
+            "name": "Backend1(1)",
+            "request": "launch",
+            "mainClass": "com.swen.loadbalancer.Backends.Backend1",
+            "projectName": "loadbalancer"
+        },
+        {
+            "type": "java",
+            "name": "Backend2(1)",
+            "request": "launch",
+            "mainClass": "com.swen.loadbalancer.Backends.Backend2",
+            "projectName": "loadbalancer"
+        },
+        {
+            "type": "java",
+            "name": "LoadbalancerApplication(1)",
+            "request": "launch",
+            "mainClass": "com.swen.loadbalancer.lb.LoadbalancerApplication",
+            "projectName": "loadbalancer"
+        },
+        {
+            "type": "java",
+            "name": "Main(1)",
+            "request": "launch",
+            "mainClass": "com.swen.loadbalancer.lb.Main",
+            "projectName": "loadbalancer"
+        },
+        {
+            "type": "java",
+            "name": "StartLoadBalancer(1)",
+            "request": "launch",
+            "mainClass": "com.swen.loadbalancer.lb.StartLoadBalancer",
+            "projectName": "loadbalancer"
+        }
+    ]
+}
