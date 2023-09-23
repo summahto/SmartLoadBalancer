@@ -99,8 +99,8 @@ public class Loadbalancer extends HeartBeatReceiver implements Runnable {
                         break;
                 }
                 System.out.println(responseToClient);
-                writeToClient.println(responseToClient);
-                writeToClient.flush();
+                // writeToClient.println(responseToClient);
+                // writeToClient.flush();
             }
 
         } catch (IOException e) {

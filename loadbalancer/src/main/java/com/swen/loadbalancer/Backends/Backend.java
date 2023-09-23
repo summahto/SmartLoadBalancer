@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.util.concurrent.Executors;
@@ -18,92 +17,94 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Backend {
 
     private static int count = 0;
-    // Class will implement the heartbeat sender logic here
-    // Schedule heart beat to be sent every sending interval
-
-    // TODO : send heartbeat (use ScheduledExecutor)
-    // TODO : receive requests from LoadBalancer once the aliveness is verified.
 
     public int SENDING_INTERVAL_SECONDS = 5;
     private ScheduledExecutorService heartbeatScheduler;
     private int port;
     private AtomicBoolean isAlive;
+    private Socket server;
 
     public Backend(int port) {
         this.port = port;
         this.isAlive = new AtomicBoolean(false);
-        this.heartbeatScheduler = Executors.newScheduledThreadPool(1);
-    }
-
-    public void start() {
-        heartbeatScheduler.scheduleAtFixedRate(this::sendHeartbeat, SENDING_INTERVAL_SECONDS,
-                SENDING_INTERVAL_SECONDS,
-                TimeUnit.SECONDS);
+        this.heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     public boolean isAlive() {
         return isAlive.get();
     }
 
+    public void start() {
+        try {
+            server = new Socket("localhost", this.port);
+            isAlive.set(true); // Mark the backend as alive when the connection is established
+        } catch (IOException e) {
+            // Handle connection errors
+            System.err.println("Error establishing the initial connection on port " + port);
+            isAlive.set(false);
+        }
+
+        // scheduling the heartbeat with an interval
+        heartbeatScheduler.scheduleAtFixedRate(() -> sendHeartbeat(), 0, SENDING_INTERVAL_SECONDS, TimeUnit.SECONDS);
+    }
+
     private void sendHeartbeat() {
-        ServerSocket serverSocket = null;
-        Socket clientSocket = null;
-
-        try (Socket server = new Socket("localhost", 6000);
-                InputStream fromServer = server.getInputStream();
-                InputStreamReader reader = new InputStreamReader(fromServer);
-                BufferedReader brFromServer = new BufferedReader(reader);
-
+        try {
+            if (server != null && !server.isClosed()) {
                 OutputStream toServer = server.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toServer);
-                PrintWriter serverWriter = new PrintWriter(outputStreamWriter)) {
-            // Create a ServerSocket and bind it to the specified port
+                PrintWriter serverWriter = new PrintWriter(outputStreamWriter);
 
-            // serverSocket = new ServerSocket(port);
-            // System.out.println("Listening for heartbeat on port " + port);
-
-            // Accept a client connection (the Load Balancer)
-            // clientSocket = serverSocket.accept();
-            // System.out.println("Received heartbeat request from " + port);
-
-            // Assuming the heartbeat is successful
-            // isAlive.set(true);
-
-            String line;
-            do {
+                // Send Heartbeat
                 System.out.println("Sending heartbeat for " + count++ + " from backend to load-balancer");
                 serverWriter.println("heartbeat");
                 serverWriter.flush();
-                line = brFromServer.readLine();
-
-                if (!line.contains("heartbeat")) {
-                    receiveRequest(line);
-
-                }
-
-            } while (line != null);
-
-            // Simulate receiving a request from the LoadBalancer
-            // Receive the Load Balancer request here
+            } else {
+                // Handle case where the connection is closed
+                System.err.println("Connection on port " + port + " is closed. Re-establishing...");
+                server = new Socket("localhost", this.port);
+            }
         } catch (IOException e) {
-            // Handle exceptions, e.g., connection errors
+            // Handle other exceptions
             System.err.println("Error sending heartbeat on port " + port);
             isAlive.set(false);
-        } finally {
-            try {
-                // Close the client socket
-                if (clientSocket != null) {
-                    clientSocket.close();
-                }
-                // Close the server socket
-                if (serverSocket != null) {
-                    serverSocket.close();
-                }
-            } catch (IOException e) {
-                System.err.println("Error closing sockets: " + e.getMessage());
-            }
         }
     }
+
+    // private void sendHeartbeat() {
+
+    // try (Socket server = new Socket("localhost", this.port);
+    // // InputStream fromServer = server.getInputStream();
+    // // InputStreamReader reader = new InputStreamReader(fromServer);
+    // // BufferedReader brFromServer = new BufferedReader(reader);
+
+    // OutputStream toServer = server.getOutputStream();
+    // OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toServer);
+    // PrintWriter serverWriter = new PrintWriter(outputStreamWriter)) {
+
+    // // Send Hearbeat
+    // System.out.println("Sending heartbeat for " + count++ + " from backend to
+    // load-balancer");
+    // serverWriter.println("heartbeat");
+    // serverWriter.flush();
+
+    // // String line;
+    // // do {
+    // // line = brFromServer.readLine();
+
+    // // if (!line.contains("heartbeat")) {
+    // // receiveRequest(line);
+
+    // // }
+
+    // // } while (line != null);
+
+    // } catch (IOException e) {
+    // // Handle exceptions, e.g., connection errors
+    // e.printStackTrace();
+    // System.err.println("Error sending heartbeat on port " + port);
+    // }
+    // }
 
     private void receiveRequest(String request) throws IOException {
         // BufferedReader and read the request from the input stream of the clientSocket
