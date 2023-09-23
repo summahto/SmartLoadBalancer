@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Backend1 {
-    public int SENDING_INTERVAL_SECONDS = 5;
+    public int SENDING_INTERVAL_SECONDS = 10;
     private ScheduledExecutorService heartbeatScheduler;
     private int listeningPort;
     private AtomicBoolean isAlive;
