@@ -1,13 +1,16 @@
-package com.swen.loadbalancer;
-
-import java.util.concurrent.ScheduledExecutorService;
+package com.swen.loadbalancer.lb;
 
 public abstract class HeartBeatReceiver {
 
-    private int checkingInterval;
-    private int checkingTime;
-    private int expireTime;
+    protected long checkingInterval;
+    protected long checkingTime;
+    protected long expireTime;
+    protected long lastUpdatedTime;
 
-    // ScheduledExecutorService ses
+    // update the lastUpdatedTime with the last received message
+    public abstract void updateTime(long milliseconds);
+
+    // current time - last updated time < max Waiting time (threshold) for aliveness
+    // public abstract boolean checkAlive();
 
 }

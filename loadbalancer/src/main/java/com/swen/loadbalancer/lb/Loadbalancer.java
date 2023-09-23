@@ -1,4 +1,4 @@
-package com.swen.loadbalancer;
+package com.swen.loadbalancer.lb;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,8 +11,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 
-public class Loadbalancer implements Runnable {
+public class Loadbalancer extends HeartBeatReceiver implements Runnable {
 
+    // TODO : When LB and Backends are in different machines, host info needs to be
+    // stored.
+    // private int host;
     private int port;
 
     public Loadbalancer(int port) {
@@ -86,6 +89,11 @@ public class Loadbalancer implements Runnable {
                         responseToClient = "game_over";
                         break;
 
+                    case "heartbeat":
+                        updateTime(System.currentTimeMillis());
+                        responseToClient = "Received your heartbeat, updating your status";
+                        break;
+
                     default:
                         responseToClient = "error";
                         break;
@@ -102,5 +110,19 @@ public class Loadbalancer implements Runnable {
 
         throw new UnsupportedOperationException("Unimplemented method 'run'");
     }
+
+    @Override
+    public void updateTime(long milliseconds) {
+        this.lastUpdatedTime = milliseconds;
+        ServerPool serverPool = ServerPool.getInstance();
+        serverPool.addBackend("localhost", String.valueOf(this.port), milliseconds);
+
+    }
+
+    // @Override
+    // public boolean checkAlive() {
+    // // TODO Auto-generated method stub
+    // throw new UnsupportedOperationException("Unimplemented method 'checkAlive'");
+    // }
 
 }
