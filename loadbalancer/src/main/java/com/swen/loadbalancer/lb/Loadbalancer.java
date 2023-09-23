@@ -108,7 +108,7 @@ public class Loadbalancer extends HeartBeatReceiver implements Runnable {
             System.exit(1);
         }
 
-        throw new UnsupportedOperationException("Unimplemented method 'run'");
+        // throw new UnsupportedOperationException("Unimplemented method 'run'");
     }
 
     @Override

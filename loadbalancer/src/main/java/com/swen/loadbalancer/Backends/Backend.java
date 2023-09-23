@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Backend {
 
+    private static int count = 0;
     // Class will implement the heartbeat sender logic here
     // Schedule heart beat to be sent every sending interval
 
@@ -31,11 +32,13 @@ public class Backend {
     public Backend(int port) {
         this.port = port;
         this.isAlive = new AtomicBoolean(false);
-        this.heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
+        this.heartbeatScheduler = Executors.newScheduledThreadPool(1);
     }
 
     public void start() {
-        heartbeatScheduler.scheduleAtFixedRate(this::sendHeartbeat, 0, SENDING_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        heartbeatScheduler.scheduleAtFixedRate(this::sendHeartbeat, SENDING_INTERVAL_SECONDS,
+                SENDING_INTERVAL_SECONDS,
+                TimeUnit.SECONDS);
     }
 
     public boolean isAlive() {
@@ -64,11 +67,24 @@ public class Backend {
             // System.out.println("Received heartbeat request from " + port);
 
             // Assuming the heartbeat is successful
-            isAlive.set(true);
+            // isAlive.set(true);
+
+            String line;
+            do {
+                System.out.println("Sending heartbeat for " + count++ + " from backend to load-balancer");
+                serverWriter.println("heartbeat");
+                serverWriter.flush();
+                line = brFromServer.readLine();
+
+                if (!line.contains("heartbeat")) {
+                    receiveRequest(line);
+
+                }
+
+            } while (line != null);
 
             // Simulate receiving a request from the LoadBalancer
             // Receive the Load Balancer request here
-            receiveRequest(clientSocket);
         } catch (IOException e) {
             // Handle exceptions, e.g., connection errors
             System.err.println("Error sending heartbeat on port " + port);
@@ -89,10 +105,11 @@ public class Backend {
         }
     }
 
-    private void receiveRequest(Socket clientSocket) throws IOException {
+    private void receiveRequest(String request) throws IOException {
         // BufferedReader and read the request from the input stream of the clientSocket
-        BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String request = reader.readLine();
+        // BufferedReader reader = new BufferedReader(new
+        // InputStreamReader(clientSocket.getInputStream()));
+        // String request = reader.readLine();
         System.out.println("Received request from LoadBalancer: " + request);
 
         // Process the request as needed
