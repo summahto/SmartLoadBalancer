@@ -25,16 +25,14 @@ public class ServerPool {
         this.backends = new HashMap<>();
     }
 
-    public void addBackend(String hostname, String port, long milliseconds) {
+    public Map<String, Backend> getBackends() {
+        return backends;
+    }
 
-        System.out.println("updating last Heartbeat received time for " + port + " with " + milliseconds + " ms");
-        if (backends.containsKey(port)) {
-            backends.get(port).setLastHeartBeatTimeUpdate(milliseconds);
-        } else {
-            Backend backend = new Backend(hostname, port, milliseconds);
-            backends.put(port, backend);
+    public void addBackend(Backend backend) {
 
-        }
+        if (!backends.containsKey(backend.getPort()))
+            backends.put(backend.getPort(), backend);
     }
 
     /*

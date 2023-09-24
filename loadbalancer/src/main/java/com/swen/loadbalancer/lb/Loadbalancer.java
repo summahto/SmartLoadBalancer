@@ -1,127 +1,155 @@
 package com.swen.loadbalancer.lb;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Random;
-import java.util.concurrent.BlockingQueue;
 
-public class Loadbalancer extends HeartBeatReceiver implements Runnable {
+public class Loadbalancer implements Runnable {
 
     // TODO : When LB and Backends are in different machines, host info needs to be
     // stored.
     // private int host;
     private int port;
+    private Backend backend;
+    // private BlockingQueue<String> blockingQueue;
 
-    private BlockingQueue<String> blockingQueue;
-
-    public Loadbalancer(int port, BlockingQueue<String> blockingQueue) {
+    public Loadbalancer(int port, Backend backend) {
         this.port = port;
-        this.blockingQueue = blockingQueue;
+        this.backend = backend;
     }
 
     @Override
     public void run() {
 
-        try (ServerSocket serverSocket = new ServerSocket(this.port);
-                Socket socket = serverSocket.accept();
-                InputStream fromClient = socket.getInputStream();
-                InputStreamReader reader = new InputStreamReader(fromClient);
-                BufferedReader brFromClient = new BufferedReader(reader);
+        try (Socket server = new Socket("localhost", this.port);
 
-                OutputStream toClient = socket.getOutputStream();
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toClient);
-                PrintWriter writeToClient = new PrintWriter(outputStreamWriter)) {
+                OutputStream toBackend = server.getOutputStream();
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toBackend);
+                PrintWriter writeToBackend = new PrintWriter(outputStreamWriter)) {
 
-            System.out.println("Connection established...:" + this.port);
-            String line = null;
-            String responseToClient = null;
+            System.out.println("Connection established.. To Backend running on port : " + this.port);
 
-            Random random1 = new Random();
-            int originalAnswer = random1.nextInt(100);
-            int guessValue = 0;
-            int guessAttempt = 0;
+            System.out.println("sleeping for 5 seconds to get data from customers");
+            try {
+                Thread.sleep(5000);
 
-            while ((line = brFromClient.readLine()) != null) {
-                String[] tokens = line.split(" ");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-                String command;
-                if (tokens.length == 1)
-                    command = tokens[0];
-                else if (tokens.length == 2) {
-                    command = tokens[0];
-                    guessValue = Integer.valueOf(tokens[1]);
-                } else {
-                    command = "invalid";
+            boolean retry = false;
+            for (int i = 0; i < 3; i++) {
+
+                retry = sendDataToBackend(writeToBackend);
+                if (retry == false)
+                    break;
+                else {
+                    System.out.println("retrying once more");
                 }
 
-                switch (command) {
-                    case "restart": {
-                        Random random2 = new Random();
-                        originalAnswer = random2.nextInt(100);
-                        guessAttempt = 0;
-                        responseToClient = "restarted";
-                        System.out.println("game restarted");
-                    }
-                        break;
-
-                    case "guess": {
-                        guessAttempt++;
-
-                        if (guessAttempt > 6) {
-                            responseToClient = "out_of_guesses";
-
-                        } else {
-                            if (guessValue < originalAnswer) {
-                                responseToClient = "toolow";
-                            } else if (guessValue > originalAnswer) {
-                                responseToClient = "toohigh";
-                            } else if (guessValue == originalAnswer) {
-                                responseToClient = "correct";
-                            }
-                        }
-                    }
-                        break;
-
-                    case "quit":
-                        responseToClient = "game_over";
-                        break;
-
-                    case "heartbeat":
-                        updateTime(System.currentTimeMillis());
-                        responseToClient = "Received your heartbeat, updating your status";
-                        break;
-
-                    default:
-                        responseToClient = "error";
-                        break;
-                }
-                System.out.println(responseToClient);
-                // writeToClient.println(responseToClient);
-                // writeToClient.flush();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        // throw new UnsupportedOperationException("Unimplemented method 'run'");
     }
 
-    @Override
-    public void updateTime(long milliseconds) {
-        this.lastUpdatedTime = milliseconds;
-        ServerPool serverPool = ServerPool.getInstance();
-        serverPool.addBackend("localhost", String.valueOf(this.port), milliseconds);
+    private boolean sendDataToBackend(PrintWriter writeToClient) throws InterruptedException {
 
+        boolean retry = true;
+        while (!this.backend.getMessageQueue().isEmpty()) {
+            System.out.println("Sending data to server running on port: " + this.backend.getPort());
+            writeToClient.println(this.backend.getMessageQueue().take());
+            writeToClient.flush();
+
+            retry = false;
+        }
+        return retry;
     }
+
+    // private void getHeartBeat(BufferedReader brFromClient) throws IOException {
+
+    // String line = null;
+    // String responseToClient = null;
+
+    // Random random1 = new Random();
+    // int originalAnswer = random1.nextInt(100);
+    // int guessValue = 0;
+    // int guessAttempt = 0;
+
+    // while ((line = brFromClient.readLine()) != null) {
+    // String[] tokens = line.split(" ");
+
+    // String command;
+    // if (tokens.length == 1)
+    // command = tokens[0];
+    // else if (tokens.length == 2) {
+    // command = tokens[0];
+    // guessValue = Integer.valueOf(tokens[1]);
+    // } else {
+    // command = "invalid";
+    // }
+
+    // switch (command) {
+    // case "restart": {
+    // Random random2 = new Random();
+    // originalAnswer = random2.nextInt(100);
+    // guessAttempt = 0;
+    // responseToClient = "restarted";
+    // System.out.println("game restarted");
+    // }
+    // break;
+
+    // case "guess": {
+    // guessAttempt++;
+
+    // if (guessAttempt > 6) {
+    // responseToClient = "out_of_guesses";
+
+    // } else {
+    // if (guessValue < originalAnswer) {
+    // responseToClient = "toolow";
+    // } else if (guessValue > originalAnswer) {
+    // responseToClient = "toohigh";
+    // } else if (guessValue == originalAnswer) {
+    // responseToClient = "correct";
+    // }
+    // }
+    // }
+    // break;
+
+    // case "quit":
+    // responseToClient = "game_over";
+    // break;
+
+    // case "heartbeat":
+    // updateTime(System.currentTimeMillis());
+    // responseToClient = "Received your heartbeat, updating your status";
+    // break;
+
+    // default:
+    // responseToClient = "error";
+    // break;
+    // }
+
+    // System.out.println(responseToClient);
+    // // writeToClient.println(responseToClient);
+    // // writeToClient.flush();
+    // }
+    // }
+
+    // @Override
+    // public void updateTime(long milliseconds) {
+    // this.lastUpdatedTime = milliseconds;
+    // this.backend.updateLastHeartbeatReceivedTime(milliseconds);
+
+    // }
 
     // @Override
     // public boolean checkAlive() {
