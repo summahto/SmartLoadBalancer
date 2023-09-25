@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.rmi.server.ServerNotActiveException;
 
 public class Loadbalancer implements Runnable {
 
@@ -39,23 +40,22 @@ public class Loadbalancer implements Runnable {
                 e.printStackTrace();
             }
 
-            boolean retry = false;
-            for (int i = 0; i < 3; i++) {
+            while (backend.isAlive())
+                sendDataToBackend(writeToBackend);
 
-                retry = sendDataToBackend(writeToBackend);
-                if (retry == false)
-                    break;
-                else {
-                    System.out.println("retrying once more");
-                }
-
-            }
+            throw new ServerNotActiveException(
+                    " Backend running at port : " + this.backend.getPort() + " is not available");
 
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
+
+        } catch (ServerNotActiveException sne) {
+            System.out.println(sne.getMessage());
+            sne.printStackTrace();
         }
 
     }
@@ -72,89 +72,4 @@ public class Loadbalancer implements Runnable {
         }
         return retry;
     }
-
-    // private void getHeartBeat(BufferedReader brFromClient) throws IOException {
-
-    // String line = null;
-    // String responseToClient = null;
-
-    // Random random1 = new Random();
-    // int originalAnswer = random1.nextInt(100);
-    // int guessValue = 0;
-    // int guessAttempt = 0;
-
-    // while ((line = brFromClient.readLine()) != null) {
-    // String[] tokens = line.split(" ");
-
-    // String command;
-    // if (tokens.length == 1)
-    // command = tokens[0];
-    // else if (tokens.length == 2) {
-    // command = tokens[0];
-    // guessValue = Integer.valueOf(tokens[1]);
-    // } else {
-    // command = "invalid";
-    // }
-
-    // switch (command) {
-    // case "restart": {
-    // Random random2 = new Random();
-    // originalAnswer = random2.nextInt(100);
-    // guessAttempt = 0;
-    // responseToClient = "restarted";
-    // System.out.println("game restarted");
-    // }
-    // break;
-
-    // case "guess": {
-    // guessAttempt++;
-
-    // if (guessAttempt > 6) {
-    // responseToClient = "out_of_guesses";
-
-    // } else {
-    // if (guessValue < originalAnswer) {
-    // responseToClient = "toolow";
-    // } else if (guessValue > originalAnswer) {
-    // responseToClient = "toohigh";
-    // } else if (guessValue == originalAnswer) {
-    // responseToClient = "correct";
-    // }
-    // }
-    // }
-    // break;
-
-    // case "quit":
-    // responseToClient = "game_over";
-    // break;
-
-    // case "heartbeat":
-    // updateTime(System.currentTimeMillis());
-    // responseToClient = "Received your heartbeat, updating your status";
-    // break;
-
-    // default:
-    // responseToClient = "error";
-    // break;
-    // }
-
-    // System.out.println(responseToClient);
-    // // writeToClient.println(responseToClient);
-    // // writeToClient.flush();
-    // }
-    // }
-
-    // @Override
-    // public void updateTime(long milliseconds) {
-    // this.lastUpdatedTime = milliseconds;
-    // this.backend.updateLastHeartbeatReceivedTime(milliseconds);
-
-    // }
-
-    // @Override
-    // public boolean checkAlive() {
-    // // TODO Auto-generated method stub
-    // throw new UnsupportedOperationException("Unimplemented method 'checkAlive'");
-    // }
-
 }

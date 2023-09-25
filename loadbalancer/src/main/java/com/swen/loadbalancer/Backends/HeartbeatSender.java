@@ -28,7 +28,7 @@ public class HeartbeatSender {
     public void start() {
         try {
             Random random = new Random();
-            randomStopCount = random.nextInt(1, 31);
+            randomStopCount = random.nextInt(1, 11);
             System.out.println("Random stop count to stop the heartbeat" + randomStopCount);
             server = new Socket("localhost", this.port);
         } catch (IOException e) {

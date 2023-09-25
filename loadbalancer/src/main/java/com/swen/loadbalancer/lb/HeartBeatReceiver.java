@@ -4,9 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -31,11 +28,7 @@ public class HeartBeatReceiver implements Runnable {
                 Socket socket = serverSocket.accept();
                 InputStream fromClient = socket.getInputStream();
                 InputStreamReader reader = new InputStreamReader(fromClient);
-                BufferedReader brFromClient = new BufferedReader(reader);
-
-                OutputStream toClient = socket.getOutputStream();
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toClient);
-                PrintWriter writeToClient = new PrintWriter(outputStreamWriter)) {
+                BufferedReader brFromClient = new BufferedReader(reader);) {
 
             System.out.println("Connection established.. To heartbeat sender running on port : " + this.port);
 
@@ -56,7 +49,10 @@ public class HeartBeatReceiver implements Runnable {
 
         int value = 0;
 
-        while ((line = brFromClient.readLine()) != null) {
+        // while ((line = brFromClient.readLine()) != null)
+        while (true) {
+
+            line = brFromClient.readLine();
             String[] tokens = line.split(" ");
 
             String command;
@@ -90,6 +86,10 @@ public class HeartBeatReceiver implements Runnable {
     public void updateTime(long milliseconds) {
         this.lastUpdatedTime = milliseconds;
         this.backend.updateLastHeartbeatReceivedTime(milliseconds);
+
+    }
+
+    public static void main(String[] args) {
 
     }
 

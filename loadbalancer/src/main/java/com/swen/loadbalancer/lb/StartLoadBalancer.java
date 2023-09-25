@@ -1,8 +1,6 @@
 package com.swen.loadbalancer.lb;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
@@ -17,25 +15,25 @@ public class StartLoadBalancer {
 
         customerDataChaseBank.forEach((customerData) -> System.out.println(customerData));
 
-        BlockingQueue<String> blockingQueue1 = new LinkedBlockingQueue<>();
+        // BlockingQueue<String> blockingQueue1 = new LinkedBlockingQueue<>();
 
-        addInitialData(customerDataChaseBank, blockingQueue1, 0, 10);
+        // addInitialData(customerDataChaseBank, blockingQueue1, 0, 10);
 
         BlockingQueue<String> blockingQueue2 = new LinkedBlockingQueue<>();
         addInitialData(customerDataChaseBank, blockingQueue2, 10, 20);
 
-        Backend backend1 = new Backend("localhost", "7000", blockingQueue1);
+        // Backend backend1 = new Backend("localhost", "7000", blockingQueue1);
         Backend backend2 = new Backend("localhost", "7001", blockingQueue2);
 
         // heartbeat Receiver initialization
-        HeartBeatReceiver heartBeatReceiver1 = new HeartBeatReceiver(6001, backend1);
-        HeartBeatReceiver heartBeatReceiver2 = new HeartBeatReceiver(6002, backend1);
+        // HeartBeatReceiver heartBeatReceiver1 = new HeartBeatReceiver(6000, backend1);
+        HeartBeatReceiver heartBeatReceiver2 = new HeartBeatReceiver(6001, backend2);
 
-        Thread heartbeatReceiverThread1 = new Thread(heartBeatReceiver1);
+        // Thread heartbeatReceiverThread1 = new Thread(heartBeatReceiver1);
         Thread heartbeatReceiverThread2 = new Thread(heartBeatReceiver2);
 
         // starting heartbeat Receivers
-        heartbeatReceiverThread1.start();
+        // heartbeatReceiverThread1.start();
         heartbeatReceiverThread2.start();
 
         // sleeping for 11 seconds so that the heratbeat sender and receiver can connect
@@ -48,58 +46,60 @@ public class StartLoadBalancer {
             e.printStackTrace();
         }
         // Load Balancer initialization
-        Loadbalancer loadbalancer1 = new Loadbalancer(7000, backend1);
-        Thread loadbalancerThread1 = new Thread(loadbalancer1);
+        // Loadbalancer loadbalancer1 = new Loadbalancer(7000, backend1);
+        // Thread loadbalancerThread1 = new Thread(loadbalancer1);
 
         Loadbalancer loadbalancer2 = new Loadbalancer(7001, backend2);
         Thread loadbalancerThread2 = new Thread(loadbalancer2);
 
         // Starting Load Balancers
-        loadbalancerThread1.start();
+        // loadbalancerThread1.start();
         loadbalancerThread2.start();
 
         ServerPool serverPool = ServerPool.getInstance();
-        serverPool.addBackend(backend1);
+        // serverPool.addBackend(backend1);
         serverPool.addBackend(backend2);
 
-        Map<String, Backend> backendMap = serverPool.getBackends();
+        // Map<String, Backend> backendMap = serverPool.getBackends();
 
-        int i = 20, j = 0;
-        while (i < customerDataChaseBank.size()) {
+        // int i = 20, j = 0;
+        // while (i < customerDataChaseBank.size()) {
 
-            Iterator<Map.Entry<String, Backend>> iterator = backendMap.entrySet().iterator();
+        // Iterator<Map.Entry<String, Backend>> iterator =
+        // backendMap.entrySet().iterator();
 
-            while (iterator.hasNext()) {
+        // while (iterator.hasNext()) {
 
-                Backend b1 = iterator.next().getValue();
-                if (b1.isAlive()) {
+        // Backend b1 = iterator.next().getValue();
+        // if (b1.isAlive()) {
 
-                    try {
+        // try {
 
-                        b1.getMessageQueue().put(customerDataChaseBank.get(i));
-                        i++;
+        // b1.getMessageQueue().put(customerDataChaseBank.get(i));
+        // i++;
 
-                    } catch (InterruptedException e) {
+        // } catch (InterruptedException e) {
 
-                        System.err.println("Unable to add data message to the queue");
-                        e.printStackTrace();
-                    }
-                } else {
-                    System.err
-                            .println("****** Backend running on  port " + b1.getPort() + " has stopped. ********");
-                    System.out.println("Routing requests to other servers");
+        // System.err.println("Unable to add data message to the queue");
+        // e.printStackTrace();
+        // }
+        // } else {
+        // System.err
+        // .println("****** Backend running on port " + b1.getPort() + " has stopped.
+        // ********");
+        // System.out.println("Routing requests to other servers");
 
-                    iterator.remove();
-                    // if (j == 1) {
-                    // System.out.println("Exiting now..");
-                    // System.exit(0);
+        // iterator.remove();
+        // // if (j == 1) {
+        // // System.out.println("Exiting now..");
+        // // System.exit(0);
 
-                    // }
-                }
+        // // }
+        // }
 
-            }
+        // }
 
-        }
+        // }
 
     }
 
