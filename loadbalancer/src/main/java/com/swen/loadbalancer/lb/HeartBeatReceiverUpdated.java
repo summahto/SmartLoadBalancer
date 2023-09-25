@@ -27,7 +27,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
             try (ServerSocket serverSocket = new ServerSocket(6001)) {
                 while (true) {
                     Socket socket = serverSocket.accept();
-                    handleHeartbeat(socket);
+                    handleHeartbeat(socket, serverSocket);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -51,7 +51,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
         }
     }
 
-    private void handleHeartbeat(Socket socket) {
+    private void handleHeartbeat(Socket socket, ServerSocket serverSocket) {
         try (InputStream fromClient = socket.getInputStream();
                 InputStreamReader reader = new InputStreamReader(fromClient);
                 BufferedReader brFromClient = new BufferedReader(reader);) {
@@ -65,31 +65,41 @@ public class HeartBeatReceiverUpdated implements Runnable {
             while (true) {
 
                 line = brFromClient.readLine();
-                String[] tokens = line.split(" ");
 
-                String command;
-                if (tokens.length == 1)
-                    command = tokens[0];
-                else if (tokens.length == 2) {
-                    command = tokens[0];
-                    value = Integer.valueOf(tokens[1]);
+                if (line != null) {
+
+                    String[] tokens = line.split(" ");
+
+                    String command;
+                    if (tokens.length == 1)
+                        command = tokens[0];
+                    else if (tokens.length == 2) {
+                        command = tokens[0];
+                        value = Integer.valueOf(tokens[1]);
+                    } else {
+                        command = "invalid";
+                    }
+
+                    switch (command) {
+
+                        case "heartbeat":
+                            this.lastUpdatedTime = System.currentTimeMillis();
+                            responseToClient = "Received your heartbeat, updating your status";
+                            break;
+
+                        default:
+                            responseToClient = "error";
+                            break;
+                    }
+
+                    System.out.println(responseToClient);
+
                 } else {
-                    command = "invalid";
+                    System.out.println("Heart Beat sender stopped. Waiting for new heartbeat sender to come up.");
+                    socket = serverSocket.accept();
+                    handleHeartbeat(socket, serverSocket);
                 }
 
-                switch (command) {
-
-                    case "heartbeat":
-                        this.lastUpdatedTime = System.currentTimeMillis();
-                        responseToClient = "Received your heartbeat, updating your status";
-                        break;
-
-                    default:
-                        responseToClient = "error";
-                        break;
-                }
-
-                System.out.println(responseToClient);
             }
 
         } catch (IOException e) {

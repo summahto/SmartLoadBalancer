@@ -31,9 +31,9 @@ public class LoadbalancerUpdated implements Runnable {
 
             System.out.println("Connection established.. To Backend running on port : " + this.port);
 
-            System.out.println("sleeping for 5 seconds to get data from customers");
+            System.out.println("waiting for a few seconds for heart beat receiver to start");
             try {
-                Thread.sleep(5000);
+                Thread.sleep(20000);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -48,7 +48,7 @@ public class LoadbalancerUpdated implements Runnable {
             } while ((System.currentTimeMillis() - lastUpdatedTime <= MAX_WAIT_TIME_IN_MILLISECONDS));
 
             System.out.println("Server is down.");
-            throw new ServerNotActiveException("No heartbeat received. Server is not available.");
+            throw new ServerNotActiveException("No heartbeat found. Server is not available.");
 
             // Add your logic to determine aliveness based on the last updated time
             // ...
