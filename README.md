@@ -32,3 +32,5 @@ Feel free to explore the Smart Load Balancer and utilize its features to enhance
 # Architecture diagram - Lucid
 
 https://lucid.app/lucidchart/aa098156-b1a4-4d1c-92af-6f8a3f7f9e73/edit?viewport_loc=-1096%2C-1028%2C2832%2C1556%2C0_0&invitationId=inv_2b792545-3d28-445f-8a80-425cad4dc68a
+![Smart Load Balancer](https://github.com/summahto/SmartLoadBalancer/assets/114707851/4e1fa7b3-2e68-41f2-80f9-d6b18ea0bd75)
+
