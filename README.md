@@ -29,7 +29,7 @@ In the event of a non-deterministic failure within the server-heartbeat process,
 
 Feel free to explore the Smart Load Balancer and utilize its features to enhance the performance and reliability of your system.
 
-# Architecture diagram - Lucid
+# Architecture diagram
 
 ![Smart Load Balancer](https://github.com/summahto/SmartLoadBalancer/assets/114707851/4e1fa7b3-2e68-41f2-80f9-d6b18ea0bd75)
 
