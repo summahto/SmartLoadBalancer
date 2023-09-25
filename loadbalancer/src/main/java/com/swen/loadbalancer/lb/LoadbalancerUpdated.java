@@ -108,7 +108,7 @@ public class LoadbalancerUpdated implements Runnable {
     }
 
     public static void main(String[] args) {
-        LoadbalancerUpdated loadbalancer = new LoadbalancerUpdated(7000);
+        LoadbalancerUpdated loadbalancer = new LoadbalancerUpdated(7001);
         Thread lbThread = new Thread(loadbalancer);
 
         lbThread.start();
