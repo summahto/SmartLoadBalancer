@@ -5,8 +5,8 @@ public class StartBackend2 {
     public static void main(String[] args) {
         // Start the heartbeat
 
-        HeartbeatSender heartbeatSender1 = new HeartbeatSender(6000);
-        BackendRunnable backendRunnable1 = new BackendRunnable(7000, heartbeatSender1);
+        HeartbeatSender heartbeatSender1 = new HeartbeatSender(6001, 9000);
+        BackendRunnable backendRunnable1 = new BackendRunnable(9000, heartbeatSender1);
 
         // sending heartbeat to loadbalancer listening on port 6000
         backendRunnable1.getHeartbeatSender().start();

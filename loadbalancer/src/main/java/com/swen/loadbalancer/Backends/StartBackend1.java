@@ -6,7 +6,7 @@ public class StartBackend1 {
 
         // Start the heartbeat
 
-        HeartbeatSender heartbeatSender2 = new HeartbeatSender(6001);
+        HeartbeatSender heartbeatSender2 = new HeartbeatSender(6001, 7001);
         BackendRunnable backendRunnable2 = new BackendRunnable(7001, heartbeatSender2);
 
         // sending heartbeat to loadbalancer listening on port 6000

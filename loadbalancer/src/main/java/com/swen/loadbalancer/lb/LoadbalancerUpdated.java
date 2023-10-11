@@ -29,7 +29,8 @@ public class LoadbalancerUpdated implements Runnable {
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toBackend);
                 PrintWriter writeToBackend = new PrintWriter(outputStreamWriter)) {
 
-            System.out.println("Connection established.. To Backend running on port : " + this.port);
+            // System.out.println("Connection established.. To Backend running on port : " +
+            // this.port);
 
             System.out.println("waiting for a few seconds for heart beat receiver to start");
             try {
@@ -50,6 +51,7 @@ public class LoadbalancerUpdated implements Runnable {
             System.out.println("Server is down.");
             throw new ServerNotActiveException("No heartbeat found. Server is not available.");
 
+            // start the backend1 again
             // Add your logic to determine aliveness based on the last updated time
             // ...
 
@@ -108,7 +110,7 @@ public class LoadbalancerUpdated implements Runnable {
     }
 
     public static void main(String[] args) {
-        LoadbalancerUpdated loadbalancer = new LoadbalancerUpdated(7000);
+        LoadbalancerUpdated loadbalancer = new LoadbalancerUpdated(7001);
         Thread lbThread = new Thread(loadbalancer);
 
         lbThread.start();

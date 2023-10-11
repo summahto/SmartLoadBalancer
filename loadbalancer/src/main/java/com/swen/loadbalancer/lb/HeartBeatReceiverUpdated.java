@@ -16,6 +16,7 @@ import java.net.Socket;
 public class HeartBeatReceiverUpdated implements Runnable {
 
     private long lastUpdatedTime = 0;
+    private int serverPort = 0;
 
     public HeartBeatReceiverUpdated() {
     }
@@ -24,7 +25,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
     public void run() {
         // Create a separate thread to listen for heartbeats on port 6000
         Thread heartbeatThread = new Thread(() -> {
-            try (ServerSocket serverSocket = new ServerSocket(6001)) {
+            try (ServerSocket serverSocket = new ServerSocket(6001, 1)) {
                 while (true) {
                     Socket socket = serverSocket.accept();
                     handleHeartbeat(socket, serverSocket);
@@ -67,8 +68,8 @@ public class HeartBeatReceiverUpdated implements Runnable {
                 line = brFromClient.readLine();
 
                 if (line != null) {
-
-                    String[] tokens = line.split(" ");
+                    // heartbeat:9000
+                    String[] tokens = line.split(":");
 
                     String command;
                     if (tokens.length == 1)
@@ -84,7 +85,8 @@ public class HeartBeatReceiverUpdated implements Runnable {
 
                         case "heartbeat":
                             this.lastUpdatedTime = System.currentTimeMillis();
-                            responseToClient = "Received your heartbeat, updating your status";
+                            this.serverPort = value;
+                            responseToClient = "Received heartbeat from :" + value + " updating your status";
                             break;
 
                         default:
@@ -96,6 +98,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
 
                 } else {
                     System.out.println("Heart Beat sender stopped. Waiting for new heartbeat sender to come up.");
+
                     socket = serverSocket.accept();
                     handleHeartbeat(socket, serverSocket);
                 }
@@ -112,7 +115,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             // Respond with the last heartbeat update time
-            String response = String.valueOf(lastUpdatedTime);
+            String response = String.valueOf(lastUpdatedTime); // TODO : send port number as well
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
