@@ -116,7 +116,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
     class ConnectionHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            String response = String.valueOf(isConnected); // TODO : send port number as well
+            String response = String.valueOf(isConnected);
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
@@ -129,7 +129,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             // Respond with the last heartbeat update time
-            String response = String.valueOf(lastUpdatedTime); // TODO : send port number as well
+            String response = String.valueOf(lastUpdatedTime + ":" + activeServerPort);
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());

@@ -37,14 +37,13 @@ public class HeartbeatSender {
             randomStopCount = random.nextInt(1, 11);
             System.out.println("Random stop count to stop the heartbeat : " + randomStopCount);
             while (getIsConnectedFromHeartBeatReceiver() == true){
-                System.out.print("Heartbeat reciever is busy \n");
+                System.out.println("Heartbeat reciever is busy \n");
                 try{
                     Thread.sleep(5000);
                 } catch(InterruptedException ie){
                     ie.printStackTrace();
                 }
-                
-            }  
+            }
             server = new Socket("localhost", this.hbReceiverPort);
         } catch (IOException e) {
             // Handle connection errors

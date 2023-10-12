@@ -17,13 +17,14 @@ public class LoadbalancerUpdated implements Runnable {
 
     private int port;
 
+    private int activeServerPort;
+
     public LoadbalancerUpdated(int port) {
         this.port = port;
     }
 
     @Override
     public void run() {
-
         try (Socket server = new Socket("localhost", this.port);
                 OutputStream toBackend = server.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toBackend);
@@ -42,7 +43,6 @@ public class LoadbalancerUpdated implements Runnable {
             do {
                 lastUpdatedTime = getLastUpdatedTimeFromHeartBeatReceiver();
                 System.out.println("Sending data to backend");
-
             } while ((System.currentTimeMillis() - lastUpdatedTime <= MAX_WAIT_TIME_IN_MILLISECONDS));
 
             System.out.println("Server is down.");
@@ -85,8 +85,13 @@ public class LoadbalancerUpdated implements Runnable {
                         response.append(line);
                     }
 
+                    // Parse the http reponse into variables. Format Time:ActivePort
+                    String r = response.toString();
+                    String[] responses = r.split(":");
+                    this.activeServerPort = Integer.parseInt(responses[1]);
+                    
                     // Parse the response content to get the last updated time
-                    return Long.parseLong(response.toString());
+                    return Long.parseLong(responses[0].toString());
                 }
             } else {
                 // Handle the case where the request was not successful
