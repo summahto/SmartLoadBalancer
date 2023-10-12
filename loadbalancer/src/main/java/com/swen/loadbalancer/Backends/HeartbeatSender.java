@@ -1,10 +1,14 @@
 package com.swen.loadbalancer.Backends;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,6 +36,15 @@ public class HeartbeatSender {
             Random random = new Random();
             randomStopCount = random.nextInt(1, 11);
             System.out.println("Random stop count to stop the heartbeat : " + randomStopCount);
+            while (getIsConnectedFromHeartBeatReceiver() == true){
+                System.out.print("Heartbeat reciever is busy \n");
+                try{
+                    Thread.sleep(5000);
+                } catch(InterruptedException ie){
+                    ie.printStackTrace();
+                }
+                
+            }  
             server = new Socket("localhost", this.hbReceiverPort);
         } catch (IOException e) {
             // Handle connection errors
@@ -45,7 +58,7 @@ public class HeartbeatSender {
 
     private void sendHeartbeat() {
         try {
-            if (server != null && !server.isClosed() && server.isConnected()) {
+            if (server != null && !server.isClosed()) {
                 OutputStream toServer = server.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toServer);
                 PrintWriter serverWriter = new PrintWriter(outputStreamWriter);
@@ -70,4 +83,48 @@ public class HeartbeatSender {
         }
     }
 
+    public Boolean getIsConnectedFromHeartBeatReceiver() {
+        try {
+            // Define the URL of the HeartBeatReceiver's /connection endpoint
+            String url = "http://localhost:8001/connection"; // Adjust the URL as needed
+
+            // Create a URL object
+            URL apiUrl = new URL(url);
+
+            // Open a connection to the URL
+            HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+
+            // Set the HTTP request method to GET
+            connection.setRequestMethod("GET");
+
+            // Get the response code (200 indicates success)
+            int responseCode = connection.getResponseCode();
+            
+            if (responseCode == 200) {
+                // Read the response content
+                try (InputStreamReader in = new InputStreamReader(connection.getInputStream());
+                        BufferedReader reader = new BufferedReader(in)) {
+
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+
+                    // Parse the response content to get the last updated time
+                    return Boolean.parseBoolean(response.toString());
+                }
+            } else {
+                // Handle the case where the request was not successful
+                System.err.println("Failed to send heartbeats. Status code: " + responseCode);
+            }
+
+            // Close the connection
+            connection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false; // Return a default value or handle the error case accordingly
+    }
 }

@@ -16,7 +16,8 @@ import java.net.Socket;
 public class HeartBeatReceiverUpdated implements Runnable {
 
     private long lastUpdatedTime = 0;
-    private int serverPort = 0;
+    private int activeServerPort = 0;
+    private Boolean isConnected = false;
 
     public HeartBeatReceiverUpdated() {
     }
@@ -28,6 +29,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
             try (ServerSocket serverSocket = new ServerSocket(6001, 1)) {
                 while (true) {
                     Socket socket = serverSocket.accept();
+                    this.isConnected = true;
                     handleHeartbeat(socket, serverSocket);
                 }
             } catch (IOException e) {
@@ -43,6 +45,9 @@ public class HeartBeatReceiverUpdated implements Runnable {
 
             // Create a context for the /heartbeat endpoint
             server.createContext("/heartbeat", new HeartbeatHandler());
+
+            // Create a context for the /connection endpoint
+            server.createContext("/connection", new ConnectionHandler());
 
             // Start the HTTP server
             server.start();
@@ -62,13 +67,11 @@ public class HeartBeatReceiverUpdated implements Runnable {
 
             int value = 0;
 
-            // while ((line = brFromClient.readLine()) != null)
             while (true) {
 
                 line = brFromClient.readLine();
 
                 if (line != null) {
-                    // heartbeat:9000
                     String[] tokens = line.split(":");
 
                     String command;
@@ -85,7 +88,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
 
                         case "heartbeat":
                             this.lastUpdatedTime = System.currentTimeMillis();
-                            this.serverPort = value;
+                            this.activeServerPort = value;
                             responseToClient = "Received heartbeat from :" + value + " updating your status";
                             break;
 
@@ -98,15 +101,26 @@ public class HeartBeatReceiverUpdated implements Runnable {
 
                 } else {
                     System.out.println("Heart Beat sender stopped. Waiting for new heartbeat sender to come up.");
-
+                    this.isConnected = false;
                     socket = serverSocket.accept();
+                    this.isConnected = true;
                     handleHeartbeat(socket, serverSocket);
                 }
-
             }
-
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+      // Define an HTTP handler for the /connection endpoint
+    class ConnectionHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String response = String.valueOf(isConnected); // TODO : send port number as well
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
         }
     }
 

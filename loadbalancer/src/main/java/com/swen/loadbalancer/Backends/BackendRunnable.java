@@ -11,15 +11,12 @@ public class BackendRunnable implements Runnable {
 
     private static int count = 0;
 
-    // public int SENDING_INTERVAL_SECONDS = 30;
-    // private ScheduledExecutorService heartbeatScheduler;
     private int port;
     private HeartbeatSender heartbeatSender;
 
     public BackendRunnable(int port, HeartbeatSender heartbeatSender) {
         this.port = port;
         this.heartbeatSender = heartbeatSender;
-        // this.heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     public HeartbeatSender getHeartbeatSender() {
