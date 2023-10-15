@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class HeartbeatSender {
+public class HeartbeatSender implements Runnable {
 
     private static int count = 0;
 
@@ -31,16 +31,21 @@ public class HeartbeatSender {
         this.heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    @Override
+    public void run() {
+        start();
+    }
+
     public void start() {
         try {
             Random random = new Random();
-            randomStopCount = random.nextInt(1, 11);
+            randomStopCount = random.nextInt(10, 15);
             System.out.println("Random stop count to stop the heartbeat : " + randomStopCount);
-            while (getIsConnectedFromHeartBeatReceiver() == true){
+            while (getIsConnectedFromHeartBeatReceiver() == true) {
                 System.out.println("Heartbeat reciever is busy \n");
-                try{
+                try {
                     Thread.sleep(5000);
-                } catch(InterruptedException ie){
+                } catch (InterruptedException ie) {
                     ie.printStackTrace();
                 }
             }
@@ -98,7 +103,7 @@ public class HeartbeatSender {
 
             // Get the response code (200 indicates success)
             int responseCode = connection.getResponseCode();
-            
+
             if (responseCode == 200) {
                 // Read the response content
                 try (InputStreamReader in = new InputStreamReader(connection.getInputStream());
@@ -126,4 +131,5 @@ public class HeartbeatSender {
 
         return false; // Return a default value or handle the error case accordingly
     }
+
 }

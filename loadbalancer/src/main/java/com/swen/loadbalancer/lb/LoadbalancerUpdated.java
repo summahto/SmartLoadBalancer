@@ -32,7 +32,7 @@ public class LoadbalancerUpdated implements Runnable {
 
             System.out.println("waiting for a few seconds for heart beat receiver to start");
             try {
-                Thread.sleep(20000);
+                Thread.sleep(5000);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -40,9 +40,18 @@ public class LoadbalancerUpdated implements Runnable {
 
             // Make an HTTP request to the HeartBeatReceiver to get the last updated time
             long lastUpdatedTime = 0;
+            String msg;
+            int idx = 0;
             do {
                 lastUpdatedTime = getLastUpdatedTimeFromHeartBeatReceiver();
-                System.out.println("Sending data to backend");
+                msg = "data : " + idx;
+
+                if (idx++ % 100000 == 0) {
+                    writeToBackend.println(msg);
+                    writeToBackend.flush();
+
+                }
+                // System.out.println("Sending data to backend");
             } while ((System.currentTimeMillis() - lastUpdatedTime <= MAX_WAIT_TIME_IN_MILLISECONDS));
 
             System.out.println("Server is down.");
@@ -89,7 +98,7 @@ public class LoadbalancerUpdated implements Runnable {
                     String r = response.toString();
                     String[] responses = r.split(":");
                     this.activeServerPort = Integer.parseInt(responses[1]);
-                    
+
                     // Parse the response content to get the last updated time
                     return Long.parseLong(responses[0].toString());
                 }
