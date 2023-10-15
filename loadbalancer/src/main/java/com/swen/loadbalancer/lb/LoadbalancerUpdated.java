@@ -15,28 +15,39 @@ public class LoadbalancerUpdated implements Runnable {
 
     private static final long MAX_WAIT_TIME_IN_MILLISECONDS = 20000;
 
-    private int port;
+    private int olderActivePort;
 
-    private int activeServerPort = 0;
+    private int currentActiveServerPort = 0;
 
     public LoadbalancerUpdated(int port) {
-        this.port = port;
+        this.olderActivePort = port;
     }
 
     @Override
     public void run() {
-        getLastUpdatedTimeFromHeartBeatReceiver();
 
-        while (this.port != this.activeServerPort){
+        while (this.olderActivePort != this.currentActiveServerPort) {
+            getLastUpdatedTimeFromHeartBeatReceiver();
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.out.println("Attempting to connect to active server port ...");
         }
-        
-        try (Socket server = new Socket("localhost", this.activeServerPort);
+        this.olderActivePort = this.currentActiveServerPort;
+
+        connectToServer();
+    }
+
+    private void connectToServer() {
+        try (Socket server = new Socket("localhost", this.olderActivePort);
                 OutputStream toBackend = server.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toBackend);
                 PrintWriter writeToBackend = new PrintWriter(outputStreamWriter)) {
-            
-            System.out.println("Connected to server port " + this.activeServerPort);
+
+            System.out.println("Connected to server port " + this.olderActivePort);
             System.out.println("waiting for a few seconds for heart beat receiver to start");
             try {
                 Thread.sleep(5000);
@@ -59,9 +70,16 @@ public class LoadbalancerUpdated implements Runnable {
 
                 }
                 // System.out.println("Sending data to backend");
-            } while ((System.currentTimeMillis() - lastUpdatedTime <= MAX_WAIT_TIME_IN_MILLISECONDS));
+            } while ((System.currentTimeMillis() - lastUpdatedTime <= MAX_WAIT_TIME_IN_MILLISECONDS)
+                    && (this.olderActivePort == this.currentActiveServerPort));
 
             System.out.println("Server is down.");
+            System.out.println("Connecting to a different backend server");
+            // 7001 -------------------- 9000
+            this.olderActivePort = this.currentActiveServerPort;
+
+            connectToServer();
+
             throw new ServerNotActiveException("No heartbeat found. Server is not available.");
 
         } catch (IOException e) {
@@ -104,7 +122,7 @@ public class LoadbalancerUpdated implements Runnable {
                     // Parse the http reponse into variables. Format Time:ActivePort
                     String r = response.toString();
                     String[] responses = r.split(":");
-                    this.activeServerPort = Integer.parseInt(responses[1]);
+                    this.currentActiveServerPort = Integer.parseInt(responses[1]);
 
                     // Parse the response content to get the last updated time
                     return Long.parseLong(responses[0].toString());
