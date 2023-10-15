@@ -17,7 +17,7 @@ public class LoadbalancerUpdated implements Runnable {
 
     private int port;
 
-    private int activeServerPort;
+    private int activeServerPort = 0;
 
     public LoadbalancerUpdated(int port) {
         this.port = port;
@@ -25,11 +25,18 @@ public class LoadbalancerUpdated implements Runnable {
 
     @Override
     public void run() {
-        try (Socket server = new Socket("localhost", this.port);
+        getLastUpdatedTimeFromHeartBeatReceiver();
+
+        while (this.port != this.activeServerPort){
+            System.out.println("Attempting to connect to active server port ...");
+        }
+        
+        try (Socket server = new Socket("localhost", this.activeServerPort);
                 OutputStream toBackend = server.getOutputStream();
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(toBackend);
                 PrintWriter writeToBackend = new PrintWriter(outputStreamWriter)) {
-
+            
+            System.out.println("Connected to server port " + this.activeServerPort);
             System.out.println("waiting for a few seconds for heart beat receiver to start");
             try {
                 Thread.sleep(20000);
