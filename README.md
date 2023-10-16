@@ -52,14 +52,15 @@ CMD Terminal 2 (Start the Kafka server)
 .\bin\windows\kafka-server-start.bat .\config\server.properties
 
 
-# Installing Kafka (Mac)
+# Installing Kafka (Mac/Linux)
 
 Download (https://www.apache.org/dyn/closer.cgi?path=/kafka/3.6.0/kafka_2.13-3.6.0.tgz) the latest Kafka release and extract it:
 
 $ tar -xzf kafka_2.13-3.6.0.tgz
+
 $ cd kafka_2.13-3.6.0
 
-start kafka
+Starting kafka
 
 Open a terminal and run the following commands one by one. 
 
