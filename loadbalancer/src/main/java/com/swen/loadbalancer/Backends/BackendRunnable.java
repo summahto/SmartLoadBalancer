@@ -76,7 +76,7 @@ public class BackendRunnable implements Runnable {
 
         System.out.println("Waiting for server to accept connection.");
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -119,10 +119,10 @@ public class BackendRunnable implements Runnable {
             e.printStackTrace();
         }
 
-        Thread heartbeatSendeThread = new Thread(this.heartbeatSender);
-        heartbeatSendeThread.start();
+        // Thread heartbeatSendeThread = new Thread(this.heartbeatSender);
+        // heartbeatSendeThread.start();
         // starting backend again
-        run();
+        // run();
 
     }
 
