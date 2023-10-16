@@ -65,6 +65,9 @@ public class LoadbalancerUpdated implements Runnable {
                 msg = "data : " + idx;
 
                 if (idx++ % 100000 == 0) {
+                    System.out
+                            .println(
+                                    "Message sent to server running on port : " + this.olderActivePort + " : " + msg);
                     writeToBackend.println(msg);
                     writeToBackend.flush();
 
