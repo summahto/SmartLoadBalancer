@@ -108,6 +108,7 @@ public class HeartBeatReceiverUpdated implements Runnable {
                 }
             }
         } catch (IOException e) {
+            this.isConnected = false;
             e.printStackTrace();
         }
     }

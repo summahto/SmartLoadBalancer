@@ -79,6 +79,7 @@ public class LoadbalancerUpdated implements Runnable {
             System.out.println("Server is down.");
             System.out.println("Connecting to a different backend server");
             // 7001 -------------------- 9000
+            getLastUpdatedTimeFromHeartBeatReceiver();
             this.olderActivePort = this.currentActiveServerPort;
 
             connectToServer();
