@@ -29,8 +29,7 @@ The SmartLoadBalancer is a robust load balancing system that optimizes server tr
 ## Architecture
 
 The SmartLoadBalancer operates as a reverse proxy, distributing communication traffic among multiple servers. This not only boosts system performance but also alleviates server maintenance.
-
-![Architecture Diagram](path_to_architecture_diagram_image)
+![Smart Load Balancer](https://github.com/summahto/SmartLoadBalancer/assets/114707851/4e1fa7b3-2e68-41f2-80f9-d6b18ea0bd75)
 
 ## Getting Started
 
@@ -111,7 +110,6 @@ The load balancer uses Kafka for checkpointing to manage data and ensure the sys
 
 Passive Redundancy Functionality Diagram - Lucid
 =======
-# Architecture diagram
 
-![Smart Load Balancer](https://github.com/summahto/SmartLoadBalancer/assets/114707851/4e1fa7b3-2e68-41f2-80f9-d6b18ea0bd75)
+
 
