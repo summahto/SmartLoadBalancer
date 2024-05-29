@@ -1,88 +1,113 @@
 # SmartLoadBalancer
 
-This is a Load Balancer which tracks the health of all the servers available (through a hearthbeat mechanism) and routes requests to a different server based on its availability.
-The Smart Load Balancer is a robust two-way communication system that employs a "heartbeat tactic" mechanism to optimize server traffic distribution.
+![SmartLoadBalancer Logo](path_to_logo_image)
 
-# Overview
+## Table of Contents
 
-In essence, a load balancer serves as a reverse proxy, efficiently distributing communication traffic among multiple servers. This not only enhances system performance but also reduces the overall server maintenance burden.
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Architecture](#architecture)
+4. [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Running the Application](#running-the-application)
+5. [Heartbeat Mechanism](#heartbeat-mechanism)
+6. [Handling Failures](#handling-failures)
+7. [Diagrams](#diagrams)
+8. [Contributing](#contributing)
+9. [License](#license)
 
-# Getting Started
+## Overview
 
-To run and test the Smart Load Balancer, clone the repo and open the project and open it in an IDE. After that, follow these steps:
+The SmartLoadBalancer is a robust load balancing system that optimizes server traffic distribution through a two-way communication mechanism known as the "heartbeat tactic." It tracks the health of all available servers and routes requests based on server availability, ensuring enhanced system performance and reduced maintenance burdens.
 
-# 1) Start the HeartBeatReciever
-Execute the main function of the heartbeatrecieverUpdated.java. This will wait for any heart beats sent by the servers.
+## Features
 
-# 2) Launch Backend Server 1
+- **Health Monitoring:** Continuously tracks the health of backend servers.
+- **Dynamic Routing:** Routes requests to available servers based on real-time status.
+- **Passive Redundancy:** Uses Kafka for checkpointing and data communication to handle server failures.
+- **Failure Handling:** Detects and manages server crashes efficiently.
 
-Run StartBackend1.java. This will trigger a response from the load balancer, confirming the successful establishment of connections.
+## Architecture
 
-# 3) Start the Load Balancer
+The SmartLoadBalancer operates as a reverse proxy, distributing communication traffic among multiple servers. This not only boosts system performance but also alleviates server maintenance.
 
-Execute LoadbalancerUpdated.java by running the main function. This action initiates the load balancer, causing it to await connections from the backend servers.
+![Architecture Diagram](path_to_architecture_diagram_image)
 
-# 4) Launch Backend Server 1
+## Getting Started
 
-Run StartBackend2.java. This will trigger a response from the load balancer, confirming the successful establishment of connections.
+### Prerequisites
 
-Heartbeat Mechanism:
-As the servers operate, they continuously send heartbeats to the load balancer at regular intervals. This mechanism ensures constant monitoring and synchronization between the servers and the load balancer.
-=======
-# 1 Start the backend 
-Execute StartBackend1.java by running the main function. This will trigger a response from the load balancer, confirming the successful establishment of connections.
+- Java Development Kit (JDK)
+- Apache Kafka
+- Integrated Development Environment (IDE) such as IntelliJ IDEA or Eclipse
 
-# 2 Run the HeartBeatReciever file
-The HeartBeatRecieverUpdated.java file is the next class to run via the main function. This will wait for heartbeats sent by the backend server.
+### Installation
 
-# 3 Launch the loadbalancer:
-Run the main function of LoadBalancerUpdated.java : This action initiates the load balancer, causing it to await connections from the backend servers.
+#### Installing Kafka (Windows)
 
-Heartbeat Mechanism
-As the servers operate, they continuously send heartbeats to the load balancer at regular intervals. This mechanism ensures constant monitoring between the server(s) and the load balancer.
+1. **Download and Install Apache Kafka:**
+   [Apache Kafka Downloads](https://kafka.apache.org/downloads)
 
-Passive Redundancy:
-We use Kafka as the checkpoint for the backend servers to communicate the data incase of any server failures. The loadbalancer is continuously updated with the most active server that the heartbeatreciever is communicating with.
+2. **Start the Zookeeper Service:**
+    ```bash
+    .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+    ```
 
-# Handling Failures
+3. **Start the Kafka Server:**
+    ```bash
+    .\bin\windows\kafka-server-start.bat .\config\server.properties
+    ```
 
-In the event of a non-deterministic failure within the server-heartbeat process, the server may crash. This crash is triggered by a randomInt value that is generated at the begining. In such cases, an error message will be generated and the backend will terminate. The loadbalancer will remain running as it awaits for any server connections.
+#### Installing Kafka (Mac/Linux)
 
-Feel free to explore the Smart Load Balancer and utilize its features to enhance the performance and reliability of your system.
+1. **Download and Extract Kafka:**
+    ```bash
+    $ tar -xzf kafka_2.13-3.6.0.tgz
+    $ cd kafka_2.13-3.6.0
+    ```
 
-# Installing Kafka (Windows)
-Download and Install Apache Kafka: https://kafka.apache.org/downloads
+2. **Start Kafka:**
+    ```bash
+    $ KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
+    $ bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/kraft/server.properties
+    $ bin/kafka-server-start.sh config/kraft/server.properties
+    ```
 
-Run these commands in separate terminals, sequentially, under the kafka folder you extracted:
+### Running the Application
 
-CMD Terminal 1 (Start the zookeeper service)
+1. **Start the HeartBeatReceiver:**
+    ```java
+    Execute the main function in `HeartBeatReceiverUpdated.java`.
+    ```
 
-.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+2. **Launch Backend Server 1:**
+    ```java
+    Run `StartBackend1.java`.
+    ```
 
-CMD Terminal 2 (Start the Kafka server)
+3. **Start the Load Balancer:**
+    ```java
+    Execute the main function in `LoadBalancerUpdated.java`.
+    ```
 
-.\bin\windows\kafka-server-start.bat .\config\server.properties
+4. **Launch Backend Server 2:**
+    ```java
+    Run `StartBackend2.java`.
+    ```
 
+## Heartbeat Mechanism
 
-# Installing Kafka (Mac/Linux)
+As the servers operate, they send heartbeats to the load balancer at regular intervals. This ensures continuous monitoring and synchronization between the servers and the load balancer.
 
-Download (https://www.apache.org/dyn/closer.cgi?path=/kafka/3.6.0/kafka_2.13-3.6.0.tgz) the latest Kafka release and extract it:
+![Heartbeat Mechanism Diagram](path_to_heartbeat_mechanism_diagram_image)
 
-$ tar -xzf kafka_2.13-3.6.0.tgz
+## Handling Failures
 
-$ cd kafka_2.13-3.6.0
+In the event of a server failure, triggered by a random integer value, the server may crash and an error message will be generated. The backend will terminate, but the load balancer will continue running, awaiting new server connections.
 
-Starting kafka
+The load balancer uses Kafka for checkpointing to manage data and ensure the system remains operational with the most active servers.
 
-Open a terminal and run the following commands one by one. 
-
-$ KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
-
-$ bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/kraft/server.properties
-
-$ bin/kafka-server-start.sh config/kraft/server.properties
-
-You should see kafka running on your terminal.
 
 # Diagram:
 
