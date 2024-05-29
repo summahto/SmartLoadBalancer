@@ -1,7 +1,5 @@
 # SmartLoadBalancer
 
-![SmartLoadBalancer Logo](path_to_logo_image)
-
 ## Table of Contents
 
 1. [Overview](#overview)
